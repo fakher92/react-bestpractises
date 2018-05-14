@@ -26,23 +26,23 @@ class App extends React.Component {
       search: "",
       editing: null
     }
-    //TODO Some of this bindings are not needed anymore
-    //handleSubmit and handleChange can be removed but handleDelete not. Fix that
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
-    this.handleUpdate = this.handleUpdate.bind(this);
-  }
+  //   //TODO Some of this bindings are not needed anymore
+  //   //handleSubmit and handleChange can be removed but handleDelete not. Fix that
+  //   this.handleSubmit = this.handleSubmit.bind(this);
+  //   this.handleChange = this.handleChange.bind(this);
+  //   this.handleDelete = this.handleDelete.bind(this);
+  //   this.handleCancel = this.handleCancel.bind(this);
+  //   this.handleUpdate = this.handleUpdate.bind(this);
+   }
   componentDidMount = () => {
-    fetch(`http://localhost:5000/api/posts`).then(resp => resp.json()).then(posts => {
+    fetch(`http://localhost:3000/api/posts`).then(resp => resp.json()).then(posts => {
       this.setState({posts});
     });
   }
   handleSubmit = (event) => {
     event.preventDefault();
     let form = {...this.state.form}
-    fetch("http://localhost:5000/api/posts", {
+    fetch("http://localhost:3000/api/posts", {
          method: "POST",
          body: JSON.stringify(form),
          headers: {
@@ -70,34 +70,47 @@ class App extends React.Component {
     this.setState({search: this.searchRef.current.value});
   }
 
-  handleDelete(id) {
-    //TODO this could be replaced by a native fetch
-    axios.delete(`http://localhost:5000/api/posts/${id}`).then(response => {
-      console.log("Slide deleted successful: ", response);
-      fetch(`http://localhost:5000/api/posts`).then(resp => resp.json()).then(posts => {
-        this.setState({posts});
-        M.toast({html: 'Post deleted!'})
-      });
-    }).catch(function(error) {
-      console.log("Error: ", error);
+  handleDelete = (id) => {
+    event.preventDefault();
+    let form = {...this.state.form}
+    fetch(`http://localhost:3000/api/posts/${id}`, {
+      method: "DELETE",
+      body: JSON.stringify(form),
+      headers: {
+        "content-type": "application/json"
+      }
+    }).then(response => response.json())
+       .then(response => {
+        console.log(response)
+        fetch(`http://localhost:3000/api/posts`).then(resp => resp.json()).then(posts => {
+         M.toast({html: `Post ${form.name} deleted!`})
+         this.setState({posts});
+        });
     })
   }
 
-  handleUpdate(event, post){
-    //TODO this could be replaced by a native fetch
-    event.preventDefault()
-    axios.put(`http://localhost:5000/api/posts/${post._id}`, this.state.form).then(response => {
-      console.log("Slide edited successful: ", response);
-      fetch(`http://localhost:5000/api/posts`).then(resp => resp.json()).then(posts => {
-        this.setState({posts, editing: null});
-        M.toast({html: 'Post updated successfully!'})
 
-      });
-    }).catch(function(error) {
-      console.log("Error: ", error);
+  //==================//
+  handleUpdate = (event, post) => {
+    event.preventDefault();
+    let form = {...this.state.form}
+    fetch(`http://localhost:3000/api/posts/${post._id}`, {
+      method: "PUT",
+      body: JSON.stringify(form),
+      headers: {
+        "content-type": "application/json"
+      }
+    }).then(response => response.json())
+       .then(response => {
+        console.log(response)
+        fetch(`http://localhost:3000/api/posts`).then(resp => resp.json()).then(posts => {
+         M.toast({html: `Post ${form.name} updated!`})
+         this.setState({posts, editing: null});
+        });
     })
-
   }
+  //==================//
+
   handleEdit = (post) => {
     this.setState({
       form: post,
