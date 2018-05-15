@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import PropTypes from 'prop-types';
 import Post from './Post.jsx';
 import SearchBar from './SearchBar.jsx';
 import Nav from './Nav.jsx';
@@ -26,13 +26,6 @@ class App extends React.Component {
       search: "",
       editing: null
     }
-  //   //TODO Some of this bindings are not needed anymore
-  //   //handleSubmit and handleChange can be removed but handleDelete not. Fix that
-  //   this.handleSubmit = this.handleSubmit.bind(this);
-  //   this.handleChange = this.handleChange.bind(this);
-  //   this.handleDelete = this.handleDelete.bind(this);
-  //   this.handleCancel = this.handleCancel.bind(this);
-  //   this.handleUpdate = this.handleUpdate.bind(this);
    }
   componentDidMount = () => {
     fetch(`http://localhost:3000/api/posts`).then(resp => resp.json()).then(posts => {
@@ -89,8 +82,6 @@ class App extends React.Component {
     })
   }
 
-
-  //==================//
   handleUpdate = (event, post) => {
     event.preventDefault();
     let form = {...this.state.form}
@@ -109,7 +100,6 @@ class App extends React.Component {
         });
     })
   }
-  //==================//
 
   handleEdit = (post) => {
     this.setState({
@@ -125,42 +115,43 @@ class App extends React.Component {
   render() {
     const posts = this.state.search !== "" ? this.state.posts.filter(p => p.name.toLowerCase().includes(this.state.search.toLowerCase())) : this.state.posts
     const posttemplate =
-              (<ul className="collection">
-                {posts.map(post => (
-                  <Post
-                    editing={this.state.editing}
-                    handleUpdate={this.handleUpdate}
-                    handleCancel={this.handleCancel}
-                    handleDelete={this.handleDelete}
-                    handleEdit={this.handleEdit}
-                    handleChange={this.handleChange}
-                    post={post}
-                    key={post._id}
-                  />
-                  ))
-                }
-                </ul>)
+      (<ul className="collection">
+        {posts.map(post => (
+          <Post
+            editing={this.state.editing}
+            handleUpdate={this.handleUpdate}
+            handleCancel={this.handleCancel}
+            handleDelete={this.handleDelete}
+            handleEdit={this.handleEdit}
+            handleChange={this.handleChange}
+            post={post}
+            key={post._id}
+          />
+        ))
+        }
+      </ul>
+      )
 
-    return (
-      <div>
-        <Nav theme={theme}/>
-        <div className="container" >
-          <div className="my-3 card">
-            <CreatePost
-              handleChange={this.handleChange}
-              handleSubmit={this.handleSubmit}
-              form={this.state.form}
-            />
+  return (
+    <div>
+      <Nav theme={theme}/>
+      <div className="container" >
+        <div className="my-3 card">
+          <CreatePost
+            handleChange={this.handleChange}
+            handleSubmit={this.handleSubmit}
+            form={this.state.form}
+          />
+        </div>
+        <div className="my-3 card">
+          <div className="card-content">
+            <h4 style={styles.nomargin}>List of all posts:</h4>
           </div>
-          <div className="my-3 card">
-            <div className="card-content">
-              <h4 style={styles.nomargin}>List of all posts:</h4>
-            </div>
-            <SearchBar inputRef={this.searchRef} handleSearch={this.handleSearch}/>
-            {posts.length > 0 ? posttemplate : <div className="card-content">Nothing found</div> }
-          </div>
+          <SearchBar inputRef={this.searchRef} handleSearch={this.handleSearch}/>
+          {posts.length > 0 ? posttemplate : <div className="card-content">Nothing found</div> }
         </div>
       </div>
+    </div>
     );
   }
 }
